@@ -1,6 +1,6 @@
 // detail đi sâu vào 1 board cụ thể chứa các colun việc
 import Container from "@mui/material/Container";
-import AppBar from "../../components/AppBar";
+import AppBar from "~/components/AppBar";
 import BoardBar from "./BoardBar";
 import BoardContent from "./BoardContent";
 
