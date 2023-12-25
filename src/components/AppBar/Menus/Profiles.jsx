@@ -32,7 +32,7 @@ const Profiles = () => {
         >
           <Avatar
             alt="avatar"
-            sx={{ width: 30, height: 30 }}
+            sx={{ width: 34, height: 34 }}
             src="https://avatars.githubusercontent.com/u/96518636?v=4"
           />
         </IconButton>
