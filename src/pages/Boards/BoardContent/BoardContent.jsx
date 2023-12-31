@@ -1,6 +1,6 @@
 /* eslint-disable no-extra-boolean-cast */
 import Box from "@mui/material/Box";
-import { cloneDeep } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
 import ListColumns from "./ListColumns/ListColumns";
 import { mapOrder } from "~/utils/sort";
 import {
@@ -19,6 +19,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./ListColumns/Column/Column";
 import Card from "./ListColumns/Column/ListCards/Card/Card";
+import { generatePlaceholderCard } from "~/utils/formaters";
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: "ACTIVE_DRAG_ITEM_TYPE_COLUMN",
@@ -93,6 +94,10 @@ const BoardContent = ({ board }) => {
         nextActiveColumn.cards = nextActiveColumn.cards.filter(
           (card) => card._id !== activeDraggingCardId
         );
+        //thêm cái card rỗng nếu như cái active column ko còn phần tử để fix cái bug 37.2
+        if (isEmpty(nextActiveColumn.cards)) {
+          nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn)];
+        }
         nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(
           (card) => card._id
         );
@@ -109,6 +114,9 @@ const BoardContent = ({ board }) => {
           newCardIndex,
           0,
           rebuild_activeDraggingCardData
+        );
+        nextOverColumn.cards = nextOverColumn.cards.filter(
+          (c) => !c.FE_PlaceholderCard
         );
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map(
           (card) => card._id
