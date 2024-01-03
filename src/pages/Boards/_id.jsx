@@ -10,7 +10,7 @@ const Board = () => {
   const [board, setBoard] = useState(null);
   useEffect(() => {
     // const boardId = reactrouterdom lấy ra => tuy nhiên chỉ làm 1 borad ở khóa này thôi
-    const boardId = "659437bf30632b9d652472ef";
+    const boardId = "6595599e85e8209d74e7319c";
     //res là cái kết quả trả về của fetchBoardDetailsAPI
     fetchBoardDetailsAPI(boardId).then((res) => {
       setBoard(res);
