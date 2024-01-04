@@ -199,6 +199,7 @@ const Column = ({ column }) => {
               }}
             >
               <TextField
+                data-no-Dnd="true"
                 sx={{
                   "& label": { color: "text.primary" },
                   "& input": {
@@ -237,6 +238,7 @@ const Column = ({ column }) => {
                 }}
               >
                 <Button
+                  data-no-Dnd="true"
                   onClick={addNewCard}
                   sx={{
                     boxShadow: "none",
