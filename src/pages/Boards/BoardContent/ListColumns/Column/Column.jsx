@@ -23,7 +23,7 @@ import { CSS } from "@dnd-kit/utilities";
 import TextField from "@mui/material/TextField";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-const Column = ({ column }) => {
+const Column = ({ createNewCard, column }) => {
   const {
     attributes,
     listeners,
@@ -55,7 +55,7 @@ const Column = ({ column }) => {
   const toggleOpenNewCardForm = () => {
     setOpenNewCardForm(!openNewCardForm);
   };
-  const addNewCard = () => {
+  const addNewCard = async () => {
     if (!newCardTitle) {
       toast.error("Please enter card title", {
         position: "bottom-right",
@@ -64,7 +64,11 @@ const Column = ({ column }) => {
       });
       return;
     }
-
+    const newCardData = {
+      title: newCardTitle,
+      columnId: column._id,
+    };
+    await createNewCard(newCardData);
     setOpenNewCardForm(false);
     setNewCardTitle("");
   };
