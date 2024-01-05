@@ -27,9 +27,7 @@ export const mapOrder = (originalArray, orderArray, key) => {
 // console.log("Ordered:", orderedArray);
 /**
  * Results:
- * 
  * Original: Of course, nothing changes =))
- * 
  * Ordered:
  *  [
       { id: 'id-5', name: 'Five' },

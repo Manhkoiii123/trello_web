@@ -25,7 +25,12 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: "ACTIVE_DRAG_ITEM_TYPE_CARD",
 };
 
-const BoardContent = ({ createNewCard, createNewColumn, board }) => {
+const BoardContent = ({
+  moveColumn,
+  createNewCard,
+  createNewColumn,
+  board,
+}) => {
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 10, //yêu cầu con chuột move 10px trước khi avtive
@@ -267,11 +272,7 @@ const BoardContent = ({ createNewCard, createNewColumn, board }) => {
           oldColumnIndex,
           newColumnIndex
         );
-        // mảng id sau khi kéo
-        //để sau gọi api để cập nhật lại cái này vào dữ liệu
-        //nếu ko có thì f5 lại thì lại về cái ban đầu
-        // const dndOrderedColumnIds = dndOrderedColumn.map((c) => c._id);
-
+        moveColumn(dndOrderedColumn);
         setOrderedColumnState(dndOrderedColumn);
       }
     }

@@ -8,6 +8,7 @@ import {
   createNewCardAPI,
   createNewColumnAPI,
   fetchBoardDetailsAPI,
+  updateBoardDetailsAPI,
 } from "~/apis";
 import { isEmpty } from "lodash";
 import { generatePlaceholderCard } from "~/utils/formaters";
@@ -56,11 +57,23 @@ const Board = () => {
     }
     setBoard(newBoard);
   };
+
+  const moveColumn = async (dndOrderedColumn) => {
+    const dndOrderedColumnIds = dndOrderedColumn.map((c) => c._id);
+    const newBoard = { ...board };
+    newBoard.columns = dndOrderedColumn;
+    newBoard.columnOrderIds = dndOrderedColumnIds;
+    setBoard(newBoard);
+    await updateBoardDetailsAPI(board._id, {
+      columnOrderIds: newBoard.columnOrderIds,
+    });
+  };
   return (
     <Container disableGutters maxWidth={false} sx={{ height: "100vh" }}>
       <AppBar />
       <BoardBar board={board} />
       <BoardContent
+        moveColumn={moveColumn}
         createNewCard={createNewCard}
         createNewColumn={createNewColumn}
         board={board}
