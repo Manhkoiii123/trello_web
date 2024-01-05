@@ -25,7 +25,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: "ACTIVE_DRAG_ITEM_TYPE_CARD",
 };
 
-const BoardContent = ({ board }) => {
+const BoardContent = ({ createNewCard, createNewColumn, board }) => {
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 10, //yêu cầu con chuột move 10px trước khi avtive
@@ -53,7 +53,7 @@ const BoardContent = ({ board }) => {
       "_id"
     );
     setOrderedColumnState(orderedColumn);
-  }, [board?.columnOrderIds, board?.columns]);
+  }, [board]);
 
   //set lại cái state cho cột,card để hiển thị
 
@@ -344,7 +344,11 @@ const BoardContent = ({ board }) => {
           p: "10px 0",
         }}
       >
-        <ListColumns columns={orderedColumnState} />
+        <ListColumns
+          createNewCard={createNewCard}
+          createNewColumn={createNewColumn}
+          columns={orderedColumnState}
+        />
         <DragOverlay dropAnimation={dropAnimation}>
           {!activeDragItemType && null}
           {activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN && (
