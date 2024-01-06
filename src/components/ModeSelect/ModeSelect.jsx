@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { useColorScheme } from "@mui/material/styles";
 import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeOutLinedIcon from "@mui/icons-material/DarkModeOutLined";
+import DarkModeOutLined from "@mui/icons-material/DarkModeOutLined";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
 import Box from "@mui/material/Box";
 const ModeSelect = () => {
@@ -50,7 +50,7 @@ const ModeSelect = () => {
         </MenuItem>
         <MenuItem value="dark">
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <DarkModeOutLinedIcon fontSize="small" /> Dark
+            <DarkModeOutLined fontSize="small" /> Dark
           </Box>
         </MenuItem>
         <MenuItem value="system">
