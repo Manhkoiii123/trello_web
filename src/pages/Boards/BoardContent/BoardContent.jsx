@@ -2,7 +2,6 @@
 import Box from "@mui/material/Box";
 import { cloneDeep, isEmpty } from "lodash";
 import ListColumns from "./ListColumns/ListColumns";
-import { mapOrder } from "~/utils/sort";
 import {
   DndContext,
   useSensor,
@@ -26,6 +25,8 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 };
 
 const BoardContent = ({
+  moveCardDifferentColumn,
+  moveCardInSameColumn,
   moveColumn,
   createNewCard,
   createNewColumn,
@@ -52,12 +53,7 @@ const BoardContent = ({
   const [activeDragItemData, setActiveDragItemData] = useState(null);
 
   useEffect(() => {
-    const orderedColumn = mapOrder(
-      board?.columns,
-      board?.columnOrderIds,
-      "_id"
-    );
-    setOrderedColumnState(orderedColumn);
+    setOrderedColumnState(board.columns);
   }, [board]);
 
   //set lại cái state cho cột,card để hiển thị
@@ -69,7 +65,8 @@ const BoardContent = ({
     over,
     activeColumn,
     activeDraggingCardId,
-    activeDraggingCardData
+    activeDraggingCardData,
+    triggerFrom
   ) => {
     //cập nhật lại state khi move card khác cột
     setOrderedColumnState((prev) => {
@@ -126,7 +123,15 @@ const BoardContent = ({
           (card) => card._id
         );
       }
-
+      if (triggerFrom === "handleDragEnd") {
+        //gọi api update ở đây
+        moveCardDifferentColumn(
+          activeDraggingCardId,
+          oldColumnWhenDraggingCard._id,
+          nextOverColumn._id,
+          nextColumns
+        );
+      }
       return nextColumns;
     });
   };
@@ -195,7 +200,8 @@ const BoardContent = ({
         over,
         activeColumn,
         activeDraggingCardId,
-        activeDraggingCardData
+        activeDraggingCardData,
+        "handleDragOver"
       );
     }
   };
@@ -224,7 +230,8 @@ const BoardContent = ({
           over,
           activeColumn,
           activeDraggingCardId,
-          activeDraggingCardData
+          activeDraggingCardData,
+          "handleDragEnd"
         );
       } else {
         //kéo cùng cột
@@ -241,6 +248,7 @@ const BoardContent = ({
           oldCardIndex,
           newCardIndex
         );
+        const dndOrderedCardIds = dndOrderedCard.map((i) => i._id);
         // cập nhật tt cái dragover
         setOrderedColumnState((prev) => {
           const nextColumns = cloneDeep(prev);
@@ -249,9 +257,14 @@ const BoardContent = ({
             (c) => c._id === overColumn._id
           );
           targetColumn.cards = dndOrderedCard;
-          targetColumn.cardOrderIds = dndOrderedCard.map((i) => i._id);
+          targetColumn.cardOrderIds = dndOrderedCardIds;
           return nextColumns;
         });
+        moveCardInSameColumn(
+          dndOrderedCard,
+          dndOrderedCardIds,
+          oldColumnWhenDraggingCard._id // là cái column được kéo
+        );
       }
     }
 
@@ -272,8 +285,8 @@ const BoardContent = ({
           oldColumnIndex,
           newColumnIndex
         );
-        moveColumn(dndOrderedColumn);
         setOrderedColumnState(dndOrderedColumn);
+        moveColumn(dndOrderedColumn);
       }
     }
     setActiveDragItemData(null);

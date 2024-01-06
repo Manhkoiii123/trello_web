@@ -17,7 +17,6 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { useState } from "react";
 import ListCards from "./ListCards/ListCards";
-import { mapOrder } from "~/utils/sort";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import TextField from "@mui/material/TextField";
@@ -40,7 +39,7 @@ const Column = ({ createNewCard, column }) => {
     opacity: isDragging ? 0.5 : undefined, // làm mờ cái column kéo đi đi
   };
 
-  const orderedCards = mapOrder(column?.cards, column?.cardOrderIds, "_id");
+  const orderedCards = column.cards;
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
