@@ -11,7 +11,12 @@ import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 
-const ListColumns = ({ createNewCard, columns, createNewColumn }) => {
+const ListColumns = ({
+  deleteColumn,
+  createNewCard,
+  columns,
+  createNewColumn,
+}) => {
   const [openNewColumnForm, setOpenNnewColumnForm] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const toggleOpenNewColumnForm = () => {
@@ -53,6 +58,7 @@ const ListColumns = ({ createNewCard, columns, createNewColumn }) => {
         {columns?.map((column) => {
           return (
             <Column
+              deleteColumn={deleteColumn}
               createNewCard={createNewCard}
               key={column?._id}
               column={column}

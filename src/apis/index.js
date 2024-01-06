@@ -36,3 +36,7 @@ export const moveCardToDifferentColumnAPI = async (updateData) => {
   );
   return response.data;
 };
+export const deleteColumnAPI = async (id) => {
+  const response = await axios.delete(`${API_ROOT}/v1/columns/${id}`);
+  return response.data;
+};

@@ -25,6 +25,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 };
 
 const BoardContent = ({
+  deleteColumn,
   moveCardDifferentColumn,
   moveCardInSameColumn,
   moveColumn,
@@ -359,6 +360,7 @@ const BoardContent = ({
         }}
       >
         <ListColumns
+          deleteColumn={deleteColumn}
           createNewCard={createNewCard}
           createNewColumn={createNewColumn}
           columns={orderedColumnState}
