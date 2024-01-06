@@ -11,9 +11,4 @@ export default defineConfig({
   resolve: {
     alias: [{ find: "~", replacement: "/src" }],
   },
-  build: {
-    rollupOptions: {
-      external: ["@mui/icons-material/DarkModeOutLined"],
-    },
-  },
 });
