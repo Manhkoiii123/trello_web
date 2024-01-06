@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import {
   createNewCardAPI,
   createNewColumnAPI,
+  deleteColumnAPI,
   fetchBoardDetailsAPI,
   moveCardToDifferentColumnAPI,
   updateBoardDetailsAPI,
@@ -17,6 +18,7 @@ import { generatePlaceholderCard } from "~/utils/formaters";
 import { mapOrder } from "~/utils/sort";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
+import { toast } from "react-toastify";
 
 const Board = () => {
   const [board, setBoard] = useState(null);
@@ -132,6 +134,15 @@ const Board = () => {
         ?.cardOrderIds,
     });
   };
+  const deleteColumn = (columnId) => {
+    const newBoard = { ...board };
+    newBoard.columns = newBoard.columns.filter((c) => c._id !== columnId);
+    newBoard.columnOrderIds = newBoard.columns.map((c) => c._id);
+    setBoard(newBoard);
+    deleteColumnAPI(columnId).then((res) => {
+      toast.success(res?.deleteResult);
+    });
+  };
   if (!board) {
     return (
       <Box sx={{ display: "flex" }}>
@@ -144,6 +155,7 @@ const Board = () => {
       <AppBar />
       <BoardBar board={board} />
       <BoardContent
+        deleteColumn={deleteColumn}
         moveColumn={moveColumn}
         moveCardDifferentColumn={moveCardDifferentColumn}
         moveCardInSameColumn={moveCardInSameColumn}
