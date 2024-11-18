@@ -8,41 +8,31 @@ import {
   createNewCardAPI,
   createNewColumnAPI,
   deleteColumnAPI,
-  fetchBoardDetailsAPI,
   moveCardToDifferentColumnAPI,
   updateBoardDetailsAPI,
   updateColumnDetailsAPI,
 } from "~/apis";
-import { isEmpty } from "lodash";
 import { generatePlaceholderCard } from "~/utils/formaters";
-import { mapOrder } from "~/utils/sort";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { toast } from "react-toastify";
+import {
+  fetchBoardDetailsAPI,
+  updateCurrentActiveBoard,
+  selectCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { cloneDeep } from "lodash";
 
 const Board = () => {
-  const [board, setBoard] = useState(null);
-  useEffect(() => {
-    // const boardId = reactrouterdom lấy ra => tuy nhiên chỉ làm 1 borad ở khóa này thôi
-    const boardId = "6595599e85e8209d74e7319c";
-    //res là cái kết quả trả về của fetchBoardDetailsAPI
-    fetchBoardDetailsAPI(boardId).then((res) => {
-      //xếp thứ tự luôn #71
-      res.columns = mapOrder(res.columns, res.columnOrderIds, "_id");
-      res.columns.forEach((c) => {
-        if (isEmpty(c.cards)) {
-          c.cards = [generatePlaceholderCard(c)];
-          c.cardOrderIds = [generatePlaceholderCard(c)._id];
-        } else {
-          //#71
-          c.cards = mapOrder(c.cards, c.cardOrderIds, "_id");
-        }
-      });
+  const dispatch = useDispatch();
+  const board = useSelector(selectCurrentActiveBoard);
 
-      setBoard(res);
-    });
-  }, []);
-  //gọi api + ref dữ liệu board
+  useEffect(() => {
+    const boardId = "6595599e85e8209d74e7319c";
+    dispatch(fetchBoardDetailsAPI(boardId));
+  }, [dispatch]);
+
   const createNewColumn = async (newColumnData) => {
     const res = await createNewColumnAPI({
       ...newColumnData,
@@ -50,17 +40,23 @@ const Board = () => {
     });
     res.cards = [generatePlaceholderCard(res)];
     res.cardOrderIds = [generatePlaceholderCard(res)._id];
+    //c1
+    // const newBoard = cloneDeep(board);
+    //c2
     const newBoard = { ...board };
-    newBoard.columns.push(res);
-    newBoard.columnOrderIds.push(res._id);
-    setBoard(newBoard);
+    newBoard.columns = newBoard.columns.concat([res]);
+    newBoard.columnOrderIds = newBoard.columnOrderIds.concat([res._id]);
+
+    // newBoard.columns.push(res);
+    // newBoard.columnOrderIds.push(res._id);
+    dispatch(updateCurrentActiveBoard(newBoard));
   };
   const createNewCard = async (newCardData) => {
     const res = await createNewCardAPI({
       ...newCardData,
       boardId: board._id,
     });
-    const newBoard = { ...board };
+    const newBoard = cloneDeep(board);
     //tim column chứa cái card vừa tạo ra
     const columnToUpdate = newBoard.columns.find((c) => c._id === res.columnId);
     if (columnToUpdate) {
@@ -74,15 +70,17 @@ const Board = () => {
         columnToUpdate.cardOrderIds.push(res._id);
       }
     }
-    setBoard(newBoard);
+    dispatch(updateCurrentActiveBoard(newBoard));
   };
 
   const moveColumn = (dndOrderedColumn) => {
     const dndOrderedColumnIds = dndOrderedColumn.map((c) => c._id);
-    const newBoard = { ...board };
+    const newBoard = cloneDeep(board);
+    // cái này nó ko push biếc gì => có thể shallow copy = spead operator được
+    // 2 dòng dưới này tương tự concat => vẫn ok
     newBoard.columns = dndOrderedColumn;
     newBoard.columnOrderIds = dndOrderedColumnIds;
-    setBoard(newBoard);
+    dispatch(updateCurrentActiveBoard(newBoard));
     updateBoardDetailsAPI(board._id, {
       columnOrderIds: newBoard.columnOrderIds,
     });
@@ -94,13 +92,13 @@ const Board = () => {
     columnId
   ) => {
     //update cho board
-    const newBoard = { ...board };
+    const newBoard = cloneDeep(board);
     const columnToUpdate = newBoard.columns.find((c) => c._id === columnId);
     if (columnToUpdate) {
       columnToUpdate.cards = dndOrderedCard;
       columnToUpdate.cardOrderIds = dndOrderedCardIds;
     }
-    setBoard(newBoard);
+    dispatch(updateCurrentActiveBoard(newBoard));
     //gọi api
     updateColumnDetailsAPI(columnId, {
       cardOrderIds: dndOrderedCardIds,
@@ -113,10 +111,10 @@ const Board = () => {
     dndOrderedColumn
   ) => {
     const dndOrderedColumnIds = dndOrderedColumn.map((c) => c._id);
-    const newBoard = { ...board };
+    const newBoard = cloneDeep(board);
     newBoard.columns = dndOrderedColumn;
     newBoard.columnOrderIds = dndOrderedColumnIds;
-    setBoard(newBoard);
+    dispatch(updateCurrentActiveBoard(newBoard));
     //fix bug 73
     let prevCardOrderIds = dndOrderedColumn.find(
       (c) => c._id === prevColumnId
@@ -135,10 +133,10 @@ const Board = () => {
     });
   };
   const deleteColumn = (columnId) => {
-    const newBoard = { ...board };
+    const newBoard = cloneDeep(board);
     newBoard.columns = newBoard.columns.filter((c) => c._id !== columnId);
     newBoard.columnOrderIds = newBoard.columns.map((c) => c._id);
-    setBoard(newBoard);
+    dispatch(updateCurrentActiveBoard(newBoard));
     deleteColumnAPI(columnId).then((res) => {
       toast.success(res?.deleteResult);
     });
