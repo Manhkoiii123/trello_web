@@ -10,13 +10,17 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
+import { createNewColumnAPI } from "~/apis";
+import { generatePlaceholderCard } from "~/utils/formaters";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectCurrentActiveBoard,
+  updateCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
 
-const ListColumns = ({
-  deleteColumn,
-  createNewCard,
-  columns,
-  createNewColumn,
-}) => {
+const ListColumns = ({ columns }) => {
+  const board = useSelector(selectCurrentActiveBoard);
+  const dispatch = useDispatch();
   const [openNewColumnForm, setOpenNnewColumnForm] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const toggleOpenNewColumnForm = () => {
@@ -34,7 +38,22 @@ const ListColumns = ({
     const newColumnData = {
       title: newColumnTitle,
     };
-    await createNewColumn(newColumnData);
+    const res = await createNewColumnAPI({
+      ...newColumnData,
+      boardId: board._id,
+    });
+    res.cards = [generatePlaceholderCard(res)];
+    res.cardOrderIds = [generatePlaceholderCard(res)._id];
+    //c1
+    // const newBoard = cloneDeep(board);
+    //c2
+    const newBoard = { ...board };
+    newBoard.columns = newBoard.columns.concat([res]);
+    newBoard.columnOrderIds = newBoard.columnOrderIds.concat([res._id]);
+
+    // newBoard.columns.push(res);
+    // newBoard.columnOrderIds.push(res._id);
+    dispatch(updateCurrentActiveBoard(newBoard));
     setOpenNnewColumnForm(false);
     setNewColumnTitle("");
   };
@@ -56,14 +75,7 @@ const ListColumns = ({
         }}
       >
         {columns?.map((column) => {
-          return (
-            <Column
-              deleteColumn={deleteColumn}
-              createNewCard={createNewCard}
-              key={column?._id}
-              column={column}
-            />
-          );
+          return <Column key={column?._id} column={column} />;
         })}
 
         {!openNewColumnForm ? (
