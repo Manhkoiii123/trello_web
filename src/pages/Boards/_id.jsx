@@ -12,15 +12,17 @@ import {
   selectCurrentActiveBoard,
 } from "~/redux/activeBoard/activeBoardSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const Board = () => {
+  const { boardId } = useParams();
   const dispatch = useDispatch();
   const board = useSelector(selectCurrentActiveBoard);
 
   useEffect(() => {
-    const boardId = "6595599e85e8209d74e7319c";
+    // 6595599e85e8209d74e7319c
     dispatch(fetchBoardDetailsAPI(boardId));
-  }, [dispatch]);
+  }, [boardId, dispatch]);
 
   if (!board) {
     return (
