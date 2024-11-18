@@ -18,21 +18,23 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./ListColumns/Column/Column";
 import Card from "./ListColumns/Column/ListCards/Card/Card";
 import { generatePlaceholderCard } from "~/utils/formaters";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectCurrentActiveBoard,
+  updateCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
+import {
+  moveCardToDifferentColumnAPI,
+  updateBoardDetailsAPI,
+  updateColumnDetailsAPI,
+} from "~/apis";
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: "ACTIVE_DRAG_ITEM_TYPE_COLUMN",
   CARD: "ACTIVE_DRAG_ITEM_TYPE_CARD",
 };
 
-const BoardContent = ({
-  deleteColumn,
-  moveCardDifferentColumn,
-  moveCardInSameColumn,
-  moveColumn,
-  createNewCard,
-  createNewColumn,
-  board,
-}) => {
+const BoardContent = () => {
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 10, //yêu cầu con chuột move 10px trước khi avtive
@@ -46,6 +48,8 @@ const BoardContent = ({
   });
   // const sensors = useSensors(pointerSenser);
   const sensors = useSensors(mouseSensor, touchSenser);
+  const dispatch = useDispatch();
+  const board = useSelector(selectCurrentActiveBoard);
 
   const [orderedColumnState, setOrderedColumnState] = useState([]);
   // cùng 1 thời điểm chỉ có 1 phần tử được kéo lưu lại các cái cần thiết
@@ -56,6 +60,66 @@ const BoardContent = ({
   useEffect(() => {
     setOrderedColumnState(board.columns);
   }, [board]);
+
+  const moveColumn = (dndOrderedColumn) => {
+    const dndOrderedColumnIds = dndOrderedColumn.map((c) => c._id);
+    const newBoard = cloneDeep(board);
+    // cái này nó ko push biếc gì => có thể shallow copy = spead operator được
+    // 2 dòng dưới này tương tự concat => vẫn ok
+    newBoard.columns = dndOrderedColumn;
+    newBoard.columnOrderIds = dndOrderedColumnIds;
+    dispatch(updateCurrentActiveBoard(newBoard));
+    updateBoardDetailsAPI(board._id, {
+      columnOrderIds: newBoard.columnOrderIds,
+    });
+  };
+
+  const moveCardDifferentColumn = (
+    currentCardId,
+    prevColumnId,
+    nextColumnId,
+    dndOrderedColumn
+  ) => {
+    const dndOrderedColumnIds = dndOrderedColumn.map((c) => c._id);
+    const newBoard = cloneDeep(board);
+    newBoard.columns = dndOrderedColumn;
+    newBoard.columnOrderIds = dndOrderedColumnIds;
+    dispatch(updateCurrentActiveBoard(newBoard));
+    //fix bug 73
+    let prevCardOrderIds = dndOrderedColumn.find(
+      (c) => c._id === prevColumnId
+    )?.cardOrderIds;
+    if (prevCardOrderIds[0].includes("placeholder-card")) {
+      prevCardOrderIds = [];
+    }
+    //gọi api
+    moveCardToDifferentColumnAPI({
+      currentCardId,
+      prevColumnId,
+      prevCardOrderIds,
+      nextColumnId,
+      nextCardOrderIds: dndOrderedColumn.find((c) => c._id === nextColumnId)
+        ?.cardOrderIds,
+    });
+  };
+  const moveCardInSameColumn = (
+    dndOrderedCard,
+    dndOrderedCardIds,
+    columnId
+  ) => {
+    //update cho board
+    const newBoard = cloneDeep(board);
+    const columnToUpdate = newBoard.columns.find((c) => c._id === columnId);
+    if (columnToUpdate) {
+      columnToUpdate.cards = dndOrderedCard;
+      columnToUpdate.cardOrderIds = dndOrderedCardIds;
+    }
+    dispatch(updateCurrentActiveBoard(newBoard));
+    //gọi api
+    updateColumnDetailsAPI(columnId, {
+      cardOrderIds: dndOrderedCardIds,
+    });
+  };
 
   //set lại cái state cho cột,card để hiển thị
 
@@ -359,12 +423,7 @@ const BoardContent = ({
           p: "10px 0",
         }}
       >
-        <ListColumns
-          deleteColumn={deleteColumn}
-          createNewCard={createNewCard}
-          createNewColumn={createNewColumn}
-          columns={orderedColumnState}
-        />
+        <ListColumns columns={orderedColumnState} />
         <DragOverlay dropAnimation={dropAnimation}>
           {!activeDragItemType && null}
           {activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN && (

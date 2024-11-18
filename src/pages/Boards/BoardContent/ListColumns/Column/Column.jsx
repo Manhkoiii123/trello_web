@@ -23,7 +23,14 @@ import TextField from "@mui/material/TextField";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import { useConfirm } from "material-ui-confirm";
-const Column = ({ deleteColumn, createNewCard, column }) => {
+import { createNewCardAPI, deleteColumnAPI } from "~/apis";
+import { cloneDeep } from "lodash";
+import {
+  selectCurrentActiveBoard,
+  updateCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
+import { useDispatch, useSelector } from "react-redux";
+const Column = ({ column }) => {
   const {
     attributes,
     listeners,
@@ -49,12 +56,35 @@ const Column = ({ deleteColumn, createNewCard, column }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  const dispatch = useDispatch();
+  const board = useSelector(selectCurrentActiveBoard);
   const [openNewCardForm, setOpenNewCardForm] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState("");
   const toggleOpenNewCardForm = () => {
     setOpenNewCardForm(!openNewCardForm);
   };
+  const createNewCard = async (newCardData) => {
+    const res = await createNewCardAPI({
+      ...newCardData,
+      boardId: board._id,
+    });
+    const newBoard = cloneDeep(board);
+    //tim column chứa cái card vừa tạo ra
+    const columnToUpdate = newBoard.columns.find((c) => c._id === res.columnId);
+    if (columnToUpdate) {
+      if (columnToUpdate.cards.some((card) => card.FE_placholderCard)) {
+        //rông
+        columnToUpdate.cards = [res];
+        columnToUpdate.cardOrderIds = [res._id];
+      } else {
+        //có đât thì push vào
+        columnToUpdate.cards.push(res);
+        columnToUpdate.cardOrderIds.push(res._id);
+      }
+    }
+    dispatch(updateCurrentActiveBoard(newBoard));
+  };
+
   const addNewCard = async () => {
     if (!newCardTitle) {
       toast.error("Please enter card title", {
@@ -71,6 +101,15 @@ const Column = ({ deleteColumn, createNewCard, column }) => {
     await createNewCard(newCardData);
     setOpenNewCardForm(false);
     setNewCardTitle("");
+  };
+  const deleteColumn = (columnId) => {
+    const newBoard = cloneDeep(board);
+    newBoard.columns = newBoard.columns.filter((c) => c._id !== columnId);
+    newBoard.columnOrderIds = newBoard.columns.map((c) => c._id);
+    dispatch(updateCurrentActiveBoard(newBoard));
+    deleteColumnAPI(columnId).then((res) => {
+      toast.success(res?.deleteResult);
+    });
   };
   const confirmDeleteColumn = useConfirm();
   const handleDeleteColumn = () => {
