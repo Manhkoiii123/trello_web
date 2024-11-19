@@ -57,7 +57,7 @@ function RegisterForm() {
               color: (theme) => theme.palette.grey[500],
             }}
           >
-            Author: TrungQuanDev
+            Author: ManhTD
           </Box>
           <Box sx={{ padding: "0 1em 1em 1em" }}>
             <Box sx={{ marginTop: "1em" }}>
@@ -117,6 +117,7 @@ function RegisterForm() {
           </Box>
           <CardActions sx={{ padding: "0 1em 1em 1em" }}>
             <Button
+              className="interceptor-loading"
               type="submit"
               variant="contained"
               color="primary"
