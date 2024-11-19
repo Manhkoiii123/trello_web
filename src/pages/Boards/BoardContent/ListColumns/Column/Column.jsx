@@ -87,11 +87,7 @@ const Column = ({ column }) => {
 
   const addNewCard = async () => {
     if (!newCardTitle) {
-      toast.error("Please enter card title", {
-        position: "bottom-right",
-        theme: "colored",
-        pauseOnHover: false,
-      });
+      toast.error("Please enter card title");
       return;
     }
     const newCardData = {
@@ -327,6 +323,7 @@ const Column = ({ column }) => {
                 }}
               >
                 <Button
+                  className="interceptor-loading"
                   data-no-Dnd="true"
                   onClick={addNewCard}
                   sx={{

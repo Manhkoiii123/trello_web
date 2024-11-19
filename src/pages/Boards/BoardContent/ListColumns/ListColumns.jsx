@@ -28,11 +28,7 @@ const ListColumns = ({ columns }) => {
   };
   const addNewColumn = async () => {
     if (!newColumnTitle) {
-      toast.error("Please enter column title!", {
-        position: "bottom-left",
-        theme: "colored",
-        pauseOnHover: false,
-      });
+      toast.error("Please enter column title!");
       return;
     }
     const newColumnData = {
@@ -152,6 +148,7 @@ const ListColumns = ({ columns }) => {
               }}
             >
               <Button
+                className="interceptor-loading"
                 onClick={addNewColumn}
                 sx={{
                   boxShadow: "none",
