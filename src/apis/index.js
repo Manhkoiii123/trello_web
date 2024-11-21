@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import authorizeAxios from "~/utils/authorizeAxios";
 
 import { API_ROOT } from "~/utils/constant";
@@ -42,5 +43,29 @@ export const moveCardToDifferentColumnAPI = async (updateData) => {
 };
 export const deleteColumnAPI = async (id) => {
   const response = await authorizeAxios.delete(`${API_ROOT}/v1/columns/${id}`);
+  return response.data;
+};
+// user
+export const registerUserAPI = async (registerData) => {
+  const response = await authorizeAxios.post(
+    `${API_ROOT}/v1/users/register`,
+    registerData
+  );
+  toast.success(
+    "Register successfully!Please check and verify your email before login",
+    {
+      theme: "colored",
+    }
+  );
+  return response.data;
+};
+export const verifyUserAPI = async (verifyData) => {
+  const response = await authorizeAxios.put(
+    `${API_ROOT}/v1/users/verify`,
+    verifyData
+  );
+  toast.success("Account verified successfully! Please login to continue", {
+    theme: "colored",
+  });
   return response.data;
 };
