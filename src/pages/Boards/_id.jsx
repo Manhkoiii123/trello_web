@@ -4,15 +4,13 @@ import AppBar from "~/components/AppBar/AppBar";
 import BoardBar from "./BoardBar/BoardBar";
 import BoardContent from "./BoardContent/BoardContent";
 import { useEffect } from "react";
-
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
   fetchBoardDetailsAPI,
   selectCurrentActiveBoard,
 } from "~/redux/activeBoard/activeBoardSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import PageLoadingSpinner from "~/components/Loading/PageLoadingSpinner";
 
 const Board = () => {
   const { boardId } = useParams();
@@ -25,11 +23,7 @@ const Board = () => {
   }, [boardId, dispatch]);
 
   if (!board) {
-    return (
-      <Box sx={{ display: "flex" }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <PageLoadingSpinner caption="Loading..." />;
   }
   return (
     <Container disableGutters maxWidth={false} sx={{ height: "100vh" }}>
