@@ -1,10 +1,20 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import Board from "~/pages/Boards/_id";
 import NotFound from "./pages/404/NotFound";
 import Auth from "./pages/Auth/Auth";
 import AccountVerification from "./pages/Auth/AccountVerification";
+import { selectCurrentUser } from "~/redux/user/userSlice";
+import { useSelector } from "react-redux";
 
+const ProtectedRoute = ({ user }) => {
+  if (!user) {
+    return <Navigate to="/login" replace={true} />;
+  } else {
+    return <Outlet />;
+  }
+};
 function App() {
+  const currentUser = useSelector(selectCurrentUser);
   return (
     <Routes>
       <Route
@@ -13,7 +23,10 @@ function App() {
         // đang ở /abc => / => /boards... nếu replace = true => sẽ ko lưu cái / nữa => từ cái /board => sang abc
         element={<Navigate to="/boards/6595599e85e8209d74e7319c" replace />}
       />
-      <Route path="/boards/:boardId" element={<Board />} />
+      <Route element={<ProtectedRoute user={currentUser} />}>
+        <Route path="/boards/:boardId" element={<Board />} />
+      </Route>
+
       <Route path="/login" element={<Auth />} />
       <Route path="/register" element={<Auth />} />
       <Route path="/account/verification" element={<AccountVerification />} />
