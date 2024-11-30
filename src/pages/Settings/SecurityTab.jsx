@@ -17,6 +17,8 @@ import FieldErrorAlert from "~/components/Form/FieldErrorAlert";
 import { useForm } from "react-hook-form";
 import { useConfirm } from "material-ui-confirm";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { logoutUserApi, updateUserApi } from "~/redux/user/userSlice";
 
 function SecurityTab() {
   const {
@@ -25,6 +27,7 @@ function SecurityTab() {
     watch,
     formState: { errors },
   } = useForm();
+  const dispatch = useDispatch();
 
   const confirmChangePassword = useConfirm();
   const submitChangePassword = (data) => {
@@ -40,11 +43,20 @@ function SecurityTab() {
       cancellationText: "Cancel",
     })
       .then(() => {
-        const { current_password, new_password, new_password_confirmation } =
-          data;
-        console.log("current_password: ", current_password);
-        console.log("new_password: ", new_password);
-        console.log("new_password_confirmation: ", new_password_confirmation);
+        const { current_password, new_password } = data;
+        toast
+          .promise(
+            dispatch(updateUserApi({ current_password, new_password })),
+            {
+              pending: "updating...",
+            }
+          )
+          .then((res) => {
+            if (!res.error) {
+              toast.success("Change password successfully. Please login again");
+              dispatch(logoutUserApi(false));
+            }
+          });
       })
       .catch(() => {});
   };
