@@ -16,13 +16,11 @@ import {
   singleFileValidator,
 } from "~/utils/validators";
 import FieldErrorAlert from "~/components/Form/FieldErrorAlert";
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "~/redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCurrentUser, updateUserApi } from "~/redux/user/userSlice";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-// Xử lý custom đẹp cái input file ở đây: https://mui.com/material-ui/react-button/#file-upload
-// Ngoài ra note thêm lib này từ docs của MUI nó recommend nếu cần dùng: https://github.com/viclafouch/mui-file-input
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -36,6 +34,7 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 function AccountTab() {
+  const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
 
   const initialGeneralForm = {
@@ -51,9 +50,17 @@ function AccountTab() {
 
   const submitChangeGeneralInformation = (data) => {
     const { displayName } = data;
-    console.log("displayName: ", displayName);
 
     if (displayName === currentUser?.displayName) return;
+    toast
+      .promise(dispatch(updateUserApi({ displayName })), {
+        pending: "updating...",
+      })
+      .then((res) => {
+        if (!res.error) {
+          toast.success("Updated successfully");
+        }
+      });
   };
 
   const uploadAvatar = (e) => {
