@@ -11,6 +11,7 @@ import AvatarGroup from "@mui/material/AvatarGroup";
 import { Tooltip } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { capitalizeFirstLetter } from "~/utils/formaters";
+import BoardUserGroup from "./BoardUserGroup";
 const MENU_STYLE = {
   color: "white",
   bgcolor: "transparent",
@@ -88,56 +89,8 @@ const BoardBar = ({ board }) => {
         >
           Invite
         </Button>
-        <AvatarGroup
-          max={4}
-          sx={{
-            gap: "10px",
-            "& .MuiAvatar-root": {
-              width: 34,
-              height: 34,
-              fontSize: 16,
-              border: "none",
-              color: "white",
-              cursor: "pointer",
-              //là cái đầu tiên (+2)
-              "&:first-of-type": {
-                bgcolor: "#a4b0be",
-              },
-            },
-          }}
-        >
-          <Tooltip title="ManhTd">
-            <Avatar
-              alt="manhTd"
-              src="https://avatars.githubusercontent.com/u/96518636?v=4"
-            />
-          </Tooltip>
-          <Tooltip title="ManhTd">
-            <Avatar
-              alt="manhTd"
-              src="https://avatars.githubusercontent.com/u/96518636?v=4"
-            />
-          </Tooltip>
-          <Tooltip title="ManhTd">
-            <Avatar
-              alt="manhTd"
-              src="https://avatars.githubusercontent.com/u/96518636?v=4"
-            />
-          </Tooltip>
-          <Tooltip title="ManhTd">
-            <Avatar
-              alt="manhTd"
-              src="https://avatars.githubusercontent.com/u/96518636?v=4"
-            />
-          </Tooltip>
-          <Tooltip title="ManhTd">
-            <Avatar
-              alt="manhTd"
-              src="https://avatars.githubusercontent.com/u/96518636?v=4"
-            />
-          </Tooltip>
-        </AvatarGroup>
       </Box>
+      <BoardUserGroup />
     </Box>
   );
 };
