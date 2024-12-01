@@ -81,3 +81,13 @@ export const fetchBoardsApi = async (searchBoard) => {
   );
   return response.data;
 };
+export const createNewBoardAPI = async (newBoardData) => {
+  const response = await authorizeAxios.post(
+    `${API_ROOT}/v1/boards`,
+    newBoardData
+  );
+  toast.success("Board created successfully!", {
+    theme: "colored",
+  });
+  return response.data;
+};
