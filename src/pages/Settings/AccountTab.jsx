@@ -73,10 +73,21 @@ function AccountTab() {
 
     let reqData = new FormData();
     reqData.append("avatar", e.target?.files[0]);
-    console.log("reqData: ", reqData);
-    for (const value of reqData.values()) {
-      console.log("reqData Value: ", value);
-    }
+    // cách log form data
+    // for (const value of reqData.values()) {
+    //   console.log("reqData Value: ", value);
+    // }
+    toast
+      .promise(dispatch(updateUserApi(reqData)), {
+        pending: "updating...",
+      })
+      .then((res) => {
+        if (!res.error) {
+          toast.success("Updated avatar successfully");
+        }
+        // lỗi hay ko thì clear cái file input của ta đi
+        e.target.value = "";
+      });
   };
 
   return (
