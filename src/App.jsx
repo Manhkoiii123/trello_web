@@ -6,6 +6,7 @@ import AccountVerification from "./pages/Auth/AccountVerification";
 import { selectCurrentUser } from "~/redux/user/userSlice";
 import { useSelector } from "react-redux";
 import Settings from "./pages/Settings/Settings";
+import Boards from "./pages/Boards";
 
 const ProtectedRoute = ({ user }) => {
   if (!user) {
@@ -22,10 +23,11 @@ function App() {
         path="/"
         // replace để ko lưu history (khi vào / => đá sang cái kia luôn => cái / ko lưu vào history)
         // đang ở /abc => / => /boards... nếu replace = true => sẽ ko lưu cái / nữa => từ cái /board => sang abc
-        element={<Navigate to="/boards/6595599e85e8209d74e7319c" replace />}
+        element={<Navigate to="/boards" replace />}
       />
       <Route element={<ProtectedRoute user={currentUser} />}>
         <Route path="/boards/:boardId" element={<Board />} />
+        <Route path="/boards" element={<Boards />} />
         <Route path="/settings/account" element={<Settings />} />
         <Route path="/settings/security" element={<Settings />} />
       </Route>

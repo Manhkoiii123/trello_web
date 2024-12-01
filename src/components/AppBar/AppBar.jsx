@@ -40,7 +40,12 @@ const AppBar = () => {
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <AppsIcon sx={{ color: "white" }} />
+        <Link to="/boards">
+          <Tooltip title="Back to boards">
+            <AppsIcon sx={{ color: "white", verticalAlign: "middle" }} />
+          </Tooltip>
+        </Link>
+
         <Link to="/" style={{ color: "white" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <SvgIcon
