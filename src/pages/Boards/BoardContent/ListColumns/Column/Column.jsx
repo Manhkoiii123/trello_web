@@ -13,7 +13,6 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddCardIcon from "@mui/icons-material/AddCard";
 import Button from "@mui/material/Button";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { useState } from "react";
 import ListCards from "./ListCards/ListCards";
@@ -23,13 +22,18 @@ import TextField from "@mui/material/TextField";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import { useConfirm } from "material-ui-confirm";
-import { createNewCardAPI, deleteColumnAPI } from "~/apis";
+import {
+  createNewCardAPI,
+  deleteColumnAPI,
+  updateColumnDetailsAPI,
+} from "~/apis";
 import { cloneDeep } from "lodash";
 import {
   selectCurrentActiveBoard,
   updateCurrentActiveBoard,
 } from "~/redux/activeBoard/activeBoardSlice";
 import { useDispatch, useSelector } from "react-redux";
+import ToggleFocusInput from "~/components/Form/ToggleFocusInput";
 const Column = ({ column }) => {
   const {
     attributes,
@@ -111,7 +115,7 @@ const Column = ({ column }) => {
   const handleDeleteColumn = () => {
     confirmDeleteColumn({
       allowClose: false,
-      title: "Delete COlumn ?",
+      title: "Delete Column ?",
       description:
         "This action will permanently delete your Column and its Cards! Are you sure?",
     })
@@ -119,6 +123,19 @@ const Column = ({ column }) => {
         deleteColumn(column._id);
       })
       .catch(() => {});
+  };
+
+  const onUpdateColumnTitle = (newTitle) => {
+    updateColumnDetailsAPI(column._id, {
+      title: newTitle.trim(),
+    }).then(() => {
+      const newBoard = cloneDeep(board);
+      const columnToUpdate = newBoard.columns.find((c) => c._id === column._id);
+      if (columnToUpdate) {
+        columnToUpdate.title = newTitle.trim();
+      }
+      dispatch(updateCurrentActiveBoard(newBoard));
+    });
   };
 
   return (
@@ -147,7 +164,12 @@ const Column = ({ column }) => {
             justifyContent: "space-between",
           }}
         >
-          <Typography
+          <ToggleFocusInput
+            value={column?.title}
+            onChangedValue={onUpdateColumnTitle}
+            data-no-Dnd="true"
+          />
+          {/* <Typography
             sx={{
               fontWeight: "bold",
               fontSize: "1rem",
@@ -155,7 +177,7 @@ const Column = ({ column }) => {
             }}
           >
             {column?.title}
-          </Typography>
+          </Typography> */}
           <Box>
             <Tooltip title="More Options">
               <ExpandMoreIcon
