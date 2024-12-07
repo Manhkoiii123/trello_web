@@ -78,19 +78,21 @@ const BoardBar = ({ board }) => {
         />
       </Box>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Button
-          sx={{
-            color: "white",
-            borderColor: "white",
-            "&:hover": { borderColor: "white" },
-          }}
-          variant="outlined"
-          startIcon={<PersonAddIcon />}
-        >
-          Invite
-        </Button>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Button
+            sx={{
+              color: "white",
+              borderColor: "white",
+              "&:hover": { borderColor: "white" },
+            }}
+            variant="outlined"
+            startIcon={<PersonAddIcon />}
+          >
+            Invite
+          </Button>
+        </Box>
+        <BoardUserGroup boardUsers={board?.FE_allUser} />
       </Box>
-      <BoardUserGroup />
     </Box>
   );
 };

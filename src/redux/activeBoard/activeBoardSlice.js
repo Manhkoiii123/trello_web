@@ -32,11 +32,29 @@ export const activeBoardSlice = createSlice({
       // update dữ liệu vào reducer
       state.currentActiveBoard = fullBoard;
     },
+    updateCartInBoard: (state, action) => {
+      const incomingCard = action.payload;
+      // tìm card thuộc column nào để update
+      const column = state.currentActiveBoard.columns.find(
+        (column) => column._id === incomingCard.columnId
+      );
+      if (column) {
+        const card = column.cards.find((card) => card._id === incomingCard._id);
+        if (card) {
+          Object.keys(incomingCard).forEach((key) => {
+            card[key] = incomingCard[key];
+          });
+        }
+      }
+    },
   },
   //thêm 1 middleware để xử lí dữ liệu bất đồng bộ
   extraReducers: (builder) => {
     builder.addCase(fetchBoardDetailsAPI.fulfilled, (state, action) => {
       let fullBoard = action.payload;
+
+      // xử lí thành vieenn của board = [...owne, ...member]
+      fullBoard.FE_allUser = [...fullBoard.owners, ...fullBoard.members];
       // xử lí dữ liệu như bên _id phần fetchBoardDetailsAPI (useEffect)
       fullBoard.columns = mapOrder(
         fullBoard.columns,
@@ -57,7 +75,8 @@ export const activeBoardSlice = createSlice({
 });
 // actions là nơi dành cho các component dưới gọi bằng dispatch tới nó để update lại dữ liệu thông qua reducer (chạy đồng bộ)
 // actions này là do redux tự tạo ra
-export const { updateCurrentActiveBoard } = activeBoardSlice.actions;
+export const { updateCurrentActiveBoard, updateCartInBoard } =
+  activeBoardSlice.actions;
 //selectors: để lấy dữ liệu từ redux ra (có thể lấy từ bên component cũng được) => call bằng useSelector()
 export const selectCurrentActiveBoard = (state) => {
   return state.activeBoard.currentActiveBoard;

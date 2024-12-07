@@ -169,15 +169,7 @@ const Column = ({ column }) => {
             onChangedValue={onUpdateColumnTitle}
             data-no-Dnd="true"
           />
-          {/* <Typography
-            sx={{
-              fontWeight: "bold",
-              fontSize: "1rem",
-              cursor: "pointer",
-            }}
-          >
-            {column?.title}
-          </Typography> */}
+
           <Box>
             <Tooltip title="More Options">
               <ExpandMoreIcon
