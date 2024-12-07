@@ -64,7 +64,6 @@ function AccountTab() {
   };
 
   const uploadAvatar = (e) => {
-    console.log("e.target?.files[0]: ", e.target?.files[0]);
     const error = singleFileValidator(e.target?.files[0]);
     if (error) {
       toast.error(error);

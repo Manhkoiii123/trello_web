@@ -32,8 +32,15 @@ import { toast } from "react-toastify";
 import CardUserGroup from "./CardUserGroup";
 import CardDescriptionMdEditor from "./CardDescriptionMdEditor";
 import CardActivitySection from "./CardActivitySection";
-
+import { useSelector, useDispatch } from "react-redux";
+import {
+  clearCurrentActiveCard,
+  selectCurrentActiveCard,
+  updateCurrentActiveCard,
+} from "~/redux/activeCard/activeCardSlice";
 import { styled } from "@mui/material/styles";
+import { updateCardDetailsAPI } from "~/apis";
+import { updateCartInBoard } from "~/redux/activeBoard/activeBoardSlice";
 const SidebarItem = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -56,18 +63,32 @@ const SidebarItem = styled(Box)(({ theme }) => ({
 }));
 
 function ActiveCard() {
-  const [isOpen, setIsOpen] = useState(true);
-  const handleOpenModal = () => setIsOpen(true);
+  const dispatch = useDispatch();
+  const currentActiveCard = useSelector(selectCurrentActiveCard);
+  // const [isOpen, setIsOpen] = useState(true);
+  // const handleOpenModal = () => setIsOpen(true);
   const handleCloseModal = () => {
-    setIsOpen(false);
+    //   setIsOpen(false);
+    dispatch(clearCurrentActiveCard());
+  };
+  const callApiUpdateCardDetails = async (updateData) => {
+    const updatedCard = await updateCardDetailsAPI(
+      currentActiveCard._id,
+      updateData
+    );
+    // cập nhật card  trong model
+    dispatch(updateCurrentActiveCard(updatedCard));
+    // cập nhật lại các bản ghi card trong board (redux)
+    dispatch(updateCartInBoard(updatedCard));
+
+    return updatedCard;
   };
 
   const onUpdateCardTitle = (newTitle) => {
-    console.log(newTitle.trim());
+    callApiUpdateCardDetails({ title: newTitle.trim() });
   };
 
   const onUploadCardCover = (event) => {
-    console.log(event.target?.files[0]);
     const error = singleFileValidator(event.target?.files[0]);
     if (error) {
       toast.error(error);
@@ -75,12 +96,21 @@ function ActiveCard() {
     }
     let reqData = new FormData();
     reqData.append("cardCover", event.target?.files[0]);
+    toast.promise(
+      callApiUpdateCardDetails(reqData).finally(
+        () => (event.target.value = ""),
+        { pending: "updating..." }
+      )
+    );
+  };
+  const handleUpdateCardDescription = (newDescription) => {
+    callApiUpdateCardDetails({ description: newDescription });
   };
 
   return (
     <Modal
       disableScrollLock
-      open={isOpen}
+      open={true}
       onClose={handleCloseModal}
       sx={{ overflowY: "auto" }}
     >
@@ -114,19 +144,20 @@ function ActiveCard() {
             onClick={handleCloseModal}
           />
         </Box>
-
-        <Box sx={{ mb: 4 }}>
-          <img
-            style={{
-              width: "100%",
-              height: "320px",
-              borderRadius: "6px",
-              objectFit: "cover",
-            }}
-            src="https://media.istockphoto.com/id/1333222351/vi/anh/%C4%91%E1%BB%99-ph%C3%A2n-gi%E1%BA%A3i-4k-c%E1%BB%A7a-n%E1%BB%81n-ch%E1%BB%A9ng-kho%C3%A1n-d%C3%B2ng-s%C3%B3ng-m%E1%BA%AFt-k%E1%BB%B9-thu%E1%BA%ADt-s%E1%BB%91.jpg?s=2048x2048&w=is&k=20&c=d7nPo3ZMeG8NAcq1VRzfmXg4IY9LvP6JNlV5xloLuXc="
-            alt="card-cover"
-          />
-        </Box>
+        {currentActiveCard?.cover && (
+          <Box sx={{ mb: 4 }}>
+            <img
+              style={{
+                width: "100%",
+                height: "320px",
+                borderRadius: "6px",
+                objectFit: "cover",
+              }}
+              src={currentActiveCard?.cover}
+              alt="card-cover"
+            />
+          </Box>
+        )}
 
         <Box
           sx={{
@@ -142,7 +173,7 @@ function ActiveCard() {
 
           <ToggleFocusInput
             inputFontSize="22px"
-            value={"card?.title"}
+            value={currentActiveCard?.title}
             onChangedValue={onUpdateCardTitle}
           />
         </Box>
@@ -173,7 +204,10 @@ function ActiveCard() {
               </Box>
 
               {/* Feature 03: Xử lý mô tả của Card */}
-              <CardDescriptionMdEditor />
+              <CardDescriptionMdEditor
+                cardDescriptionProp={currentActiveCard?.description}
+                handleUpdateCardDescription={handleUpdateCardDescription}
+              />
             </Box>
 
             <Box sx={{ mb: 3 }}>
@@ -293,3 +327,4 @@ function ActiveCard() {
 }
 
 export default ActiveCard;
+// 1:01:19 / 1:35:20

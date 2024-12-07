@@ -15,21 +15,21 @@ function BoardUserGroup({ boardUsers = [], limit = 8 }) {
 
   return (
     <Box sx={{ display: "flex", gap: "4px" }}>
-      {[...Array(16)].map((_, index) => {
+      {boardUsers.map((user, index) => {
         if (index < limit) {
           return (
-            <Tooltip title="ManhTD" key={index}>
+            <Tooltip title={user?.displayName} key={index}>
               <Avatar
                 sx={{ width: 34, height: 34, cursor: "pointer" }}
-                alt="ManhTD"
-                src="https://avatars.githubusercontent.com/u/96518636?v=4"
+                alt={user?.displayName}
+                src={user?.avatar}
               />
             </Tooltip>
           );
         }
       })}
 
-      {[...Array(16)].length > limit && (
+      {boardUsers.length > limit && (
         <Tooltip title="Show more">
           <Box
             aria-describedby={popoverId}
@@ -48,7 +48,7 @@ function BoardUserGroup({ boardUsers = [], limit = 8 }) {
               backgroundColor: "#a4b0be",
             }}
           >
-            +{[...Array(16)].length - limit}
+            +{boardUsers.length - limit}
           </Box>
         </Tooltip>
       )}
@@ -70,12 +70,12 @@ function BoardUserGroup({ boardUsers = [], limit = 8 }) {
             gap: 1,
           }}
         >
-          {[...Array(16)].map((_, index) => (
-            <Tooltip title="ManhTD" key={index}>
+          {boardUsers.slice(limit, boardUsers.length).map((user, index) => (
+            <Tooltip title={user?.displayName} key={index}>
               <Avatar
                 sx={{ width: 34, height: 34, cursor: "pointer" }}
-                alt="ManhTD"
-                src="https://avatars.githubusercontent.com/u/96518636?v=4"
+                alt={user?.displayName}
+                src={user?.avatar}
               />
             </Tooltip>
           ))}
