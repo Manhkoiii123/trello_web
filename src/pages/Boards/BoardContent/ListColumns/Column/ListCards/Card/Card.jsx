@@ -10,7 +10,10 @@ import Button from "@mui/material/Button";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useDispatch } from "react-redux";
-import { updateCurrentActiveCard } from "~/redux/activeCard/activeCardSlice";
+import {
+  showModalActiveCard,
+  updateCurrentActiveCard,
+} from "~/redux/activeCard/activeCardSlice";
 const Card = ({ card }) => {
   const dispatch = useDispatch();
 
@@ -37,6 +40,7 @@ const Card = ({ card }) => {
     );
   };
   const handleSetActiveCard = () => {
+    dispatch(showModalActiveCard());
     dispatch(updateCurrentActiveCard(card));
   };
   return (
