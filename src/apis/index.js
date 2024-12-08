@@ -98,3 +98,13 @@ export const updateCardDetailsAPI = async (cardId, updateData) => {
   );
   return response.data;
 };
+export const inviteUserToBoardAPI = async (inviteData) => {
+  const response = await authorizeAxios.post(
+    `${API_ROOT}/v1/invitations/board`,
+    inviteData
+  );
+  toast.success("Invitation sent successfully!", {
+    theme: "colored",
+  });
+  return response.data;
+};

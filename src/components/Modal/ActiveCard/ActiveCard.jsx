@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
@@ -34,8 +33,9 @@ import CardDescriptionMdEditor from "./CardDescriptionMdEditor";
 import CardActivitySection from "./CardActivitySection";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  clearCurrentActiveCard,
+  clearAndHideCurrentActiveCard,
   selectCurrentActiveCard,
+  selectIsShowModalActiveCard,
   updateCurrentActiveCard,
 } from "~/redux/activeCard/activeCardSlice";
 import { styled } from "@mui/material/styles";
@@ -65,11 +65,9 @@ const SidebarItem = styled(Box)(({ theme }) => ({
 function ActiveCard() {
   const dispatch = useDispatch();
   const currentActiveCard = useSelector(selectCurrentActiveCard);
-  // const [isOpen, setIsOpen] = useState(true);
-  // const handleOpenModal = () => setIsOpen(true);
+  const isShowModalActiveCard = useSelector(selectIsShowModalActiveCard);
   const handleCloseModal = () => {
-    //   setIsOpen(false);
-    dispatch(clearCurrentActiveCard());
+    dispatch(clearAndHideCurrentActiveCard());
   };
   const callApiUpdateCardDetails = async (updateData) => {
     const updatedCard = await updateCardDetailsAPI(
@@ -106,11 +104,15 @@ function ActiveCard() {
   const handleUpdateCardDescription = (newDescription) => {
     callApiUpdateCardDetails({ description: newDescription });
   };
-
+  const handleAddCardComment = async (commentToAdd) => {
+    await callApiUpdateCardDetails({
+      commentToAdd,
+    });
+  };
   return (
     <Modal
       disableScrollLock
-      open={true}
+      open={isShowModalActiveCard}
       onClose={handleCloseModal}
       sx={{ overflowY: "auto" }}
     >
@@ -222,7 +224,10 @@ function ActiveCard() {
               </Box>
 
               {/* Feature 04: Xử lý các hành động, ví dụ comment vào Card */}
-              <CardActivitySection />
+              <CardActivitySection
+                cardComments={currentActiveCard?.comments}
+                onAddCardComment={handleAddCardComment}
+              />
             </Box>
           </Grid>
 
