@@ -15,10 +15,14 @@ import DoneIcon from "@mui/icons-material/Done";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addNotification,
   fetchInvitationAPI,
   selectCurrentNotifications,
   updateBoardInvitationApi,
 } from "~/redux/notifications/notificationsSlice";
+import { socketIoInstance } from "~/main";
+import { selectCurrentUser } from "~/redux/user/userSlice";
+import { useNavigate } from "react-router-dom";
 const BOARD_INVITATION_STATUS = {
   PENDING: "PENDING",
   ACCEPTED: "ACCEPTED",
@@ -26,27 +30,49 @@ const BOARD_INVITATION_STATUS = {
 };
 
 function Notifications() {
+  const [newNotification, setNewNotification] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const notifications = useSelector(selectCurrentNotifications);
   const open = Boolean(anchorEl);
   const handleClickNotificationIcon = (event) => {
+    setNewNotification(false);
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
   const dispatch = useDispatch();
+  const user = useSelector(selectCurrentUser);
+  const nav = useNavigate();
 
   useEffect(() => {
     const handleFetchInvitation = () => {
       dispatch(fetchInvitationAPI());
+      // xử lí khi nhận sư kiện realtime
+      const onReceiveInvitation = (invitation) => {
+        // nếu user đang đăng nhập hiện tại là người invitee trong bản ghi invitation
+        if (invitation.inviteeId === user._id) {
+          //b1 thêm bản ghi invitation vào redux
+          dispatch(addNotification(invitation));
+          //b2 thông báo số lượng bnh thông báo realtime thì có cái nốt đỏ
+          setNewNotification(true);
+        }
+      };
+      socketIoInstance.on("invite-user-to-board-be", onReceiveInvitation);
+      return () => {
+        socketIoInstance.off("invite-user-to-board-be", onReceiveInvitation);
+      };
     };
     handleFetchInvitation();
-  }, [dispatch]);
+  }, [dispatch, user._id]);
   const updateBoardInvitation = (invitationId, status) => {
-    dispatch(updateBoardInvitationApi({ status, invitationId })).then(
-      (res) => {}
-    );
+    dispatch(updateBoardInvitationApi({ status, invitationId })).then((res) => {
+      if (
+        res.payload.boardInvitation.status === BOARD_INVITATION_STATUS.ACCEPTED
+      ) {
+        nav(`/boards/${res.payload.boardInvitation.boardId}`);
+      }
+    });
   };
 
   return (
@@ -54,8 +80,7 @@ function Notifications() {
       <Tooltip title="Notifications">
         <Badge
           color="warning"
-          // variant="none"
-          variant="dot"
+          variant={newNotification ? "dot" : "none"}
           sx={{ cursor: "pointer" }}
           id="basic-button-open-notification"
           aria-controls={open ? "basic-notification-drop-down" : undefined}
@@ -65,8 +90,7 @@ function Notifications() {
         >
           <NotificationsNoneIcon
             sx={{
-              color: "white",
-              // color: "yellow",
+              color: newNotification ? "yellow" : "white",
             }}
           />
         </Badge>
