@@ -23,9 +23,9 @@ injectStore(store);
 ReactDOM.createRoot(document.getElementById("root")).render(
   <>
     {/*  base name là /abc => mọi url đều có cái /abc phía trước  */}
-    <BrowserRouter basename="/">
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter basename="/">
           <CssVarsProvider theme={theme}>
             <ConfirmProvider>
               <GlobalStyles
@@ -40,8 +40,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <ToastContainer />
             </ConfirmProvider>
           </CssVarsProvider>
-        </PersistGate>
-      </Provider>
-    </BrowserRouter>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
   </>
 );
