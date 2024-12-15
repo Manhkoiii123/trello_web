@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "~/App.jsx";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,6 +14,9 @@ import { BrowserRouter } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
 import { injectStore } from "./utils/authorizeAxios";
+import { io } from "socket.io-client";
+import { API_ROOT } from "./utils/constant";
+export const socketIoInstance = io(API_ROOT);
 const persistor = persistStore(store);
 
 // kĩ thuật inject store vào file js thuần
